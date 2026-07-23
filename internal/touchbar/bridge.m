@@ -112,6 +112,19 @@ static NSImage *SMBBadgedImage(NSString *sfSymbolName, NSString *count) {
   return result;
 }
 
+static NSImage *SMBTrayImage(void) {
+  NSString *path = [[NSBundle mainBundle] pathForResource:@"vex" ofType:@"png"];
+  if (!path) {
+    return nil;
+  }
+  NSImage *image = [[NSImage alloc] initWithContentsOfFile:path];
+  if (!image) {
+    return nil;
+  }
+  image.size = NSMakeSize(24, 24);
+  return image;
+}
+
 static SMBAppDelegate *gDelegate;
 
 @implementation SMBAppDelegate
@@ -146,9 +159,18 @@ static SMBAppDelegate *gDelegate;
   gOffscreenWindow.level = NSStatusWindowLevel;
   [gOffscreenWindow orderFront:nil];
 
-  NSButton *trayButton = [NSButton buttonWithTitle:@"\U0001F43C"
-                                             target:self
-                                             action:@selector(trayTapped:)];
+  NSImage *trayImage = SMBTrayImage();
+  NSButton *trayButton;
+  if (trayImage) {
+    trayButton = [NSButton buttonWithImage:trayImage
+                                     target:self
+                                     action:@selector(trayTapped:)];
+    trayButton.imagePosition = NSImageOnly;
+  } else {
+    trayButton = [NSButton buttonWithTitle:@"\U0001F43C"
+                                     target:self
+                                     action:@selector(trayTapped:)];
+  }
   self.trayItem =
       [[NSCustomTouchBarItem alloc] initWithIdentifier:kTrayIdentifier];
   self.trayItem.view = trayButton;

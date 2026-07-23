@@ -4,7 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP="$ROOT/build/SMacBar.app"
 
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+cp "$ROOT/internal/assets/vex.png" "$APP/Contents/Resources/vex.png"
 
 cat <<'EOF' > "$APP/Contents/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>

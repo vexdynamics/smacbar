@@ -7,3 +7,4 @@
 # Scratch and temporary captures
 /tmp/
 *.png
+!internal/assets/*.png

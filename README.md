@@ -10,7 +10,7 @@
 
 ## ✨ Features
 
-- **Persistent Control Strip Tray Icon**: Integrates directly into the macOS Control Strip (`dev.smacbar.tray`). Tap the tray icon (🐼) to toggle your dashboard anytime.
+- **Persistent Control Strip Tray Icon**: Integrates directly into the macOS Control Strip (`dev.smacbar.tray`). Tap the tray icon (Vex) to toggle your dashboard anytime.
 - **60 FPS WebWidgets Engine**: Render custom HTML5, CSS animations, JavaScript, Canvas motion graphics, and live widgets directly onto Touch Bar items at a smooth 60 FPS.
 - **Live RSS Scrolling News Ticker**: Smooth 60 FPS news marquee fetching live RSS feeds (such as [Vex Dynamics RSS](https://vexdynamics.com/rss.xml)).
 - **Interactive Tap Actions**: Tap any widget on your Touch Bar to launch applications, open URLs, focus open apps, or execute custom shell scripts. Tapping the RSS Ticker instantly opens the currently visible news article in your browser.
@@ -45,7 +45,7 @@
    ```bash
    open build/SMacBar.app
    ```
-   The **SMacBar tray icon** (🐼) will appear in your Touch Bar Control Strip. Tap it to expand your dashboard!
+   The **SMacBar tray icon** (Vex) will appear in your Touch Bar Control Strip. Tap it to expand your dashboard!
 
 ---
 

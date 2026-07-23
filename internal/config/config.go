@@ -53,6 +53,7 @@ func DefaultPath() (string, error) {
 var defaultConfig = Config{
 	PollIntervalSeconds: 5,
 	Widgets: []Widget{
+		{ID: "rss-ticker-widget", Type: "web_file", Path: "rss_ticker.html", Width: 170},
 		{ID: "mattermost", Icon: "message.fill", Label: "MM", BundleID: "Mattermost.Desktop"},
 		{ID: "warp", Icon: "terminal", Label: "Warp", BundleID: "dev.warp.Warp-Stable"},
 		{ID: "clock-widget", Type: "web_file", Path: "clock.html", Width: 180},

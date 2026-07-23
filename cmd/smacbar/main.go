@@ -245,6 +245,144 @@ func ensureSampleWidgets(dir string) {
 </html>`
 		_ = os.WriteFile(statsPath, []byte(statsHTML), 0o644)
 	}
+
+	rssPath := filepath.Join(dir, "rss_ticker.html")
+	if _, err := os.Stat(rssPath); os.IsNotExist(err) {
+		const rssHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0d0e15;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  .ticker-item {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #00f0ff;
+    padding-right: 35px;
+  }
+</style>
+</head>
+<body>
+  <div class="ticker-track" id="track">
+    <span class="ticker-item">Loading Vex Dynamics RSS...</span>
+  </div>
+  <script>
+    let articles = [];
+    let trackX = 200;
+    let trackWidth = 500;
+    const track = document.getElementById('track');
+
+    async function fetchRSS() {
+      const urls = [
+        "https://vexdynamics.com/rss.xml",
+        "https://corsproxy.io/?https://vexdynamics.com/rss.xml",
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://vexdynamics.com/rss.xml")
+      ];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u);
+          const text = await res.text();
+          const xml = new DOMParser().parseFromString(text, "text/xml");
+          const items = xml.querySelectorAll("item");
+          const list = [];
+          items.forEach(item => {
+            const title = item.querySelector("title")?.textContent;
+            const link = item.querySelector("link")?.textContent;
+            if (title && link) {
+              list.push({ title: title.trim(), link: link.trim() });
+            }
+          });
+          if (list.length > 0) {
+            articles = list;
+            renderTrack();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // Default Vex Dynamics headlines if offline
+      articles = [
+        { title: "Vex Dynamics: AI & Robotics Engineering Updates", link: "https://vexdynamics.com" },
+        { title: "Vex Dynamics: Autonomous Systems Architecture", link: "https://vexdynamics.com" }
+      ];
+      renderTrack();
+    }
+
+    function renderTrack() {
+      track.innerHTML = '';
+      articles.forEach(art => {
+        const span = document.createElement('span');
+        span.className = 'ticker-item';
+        span.textContent = '• ' + art.title;
+        track.appendChild(span);
+      });
+      trackWidth = track.scrollWidth || 500;
+    }
+
+    let activeLinkIndex = -1;
+    function visibleArticleIndex() {
+      const items = track.children;
+      if (!items.length) return -1;
+      const center = (document.body.clientWidth || 200) / 2;
+      for (let i = 0; i < items.length; i++) {
+        const left = items[i].offsetLeft + trackX;
+        const right = left + items[i].offsetWidth;
+        if (center >= left && center < right) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function animate() {
+      trackX -= 0.8;
+      if (trackX < -trackWidth) {
+        trackX = (window.innerWidth || 200);
+      }
+      track.style.transform = 'translateX(' + trackX + 'px)';
+
+      if (articles.length > 0) {
+        const idx = visibleArticleIndex();
+        if (idx !== -1 && idx !== activeLinkIndex && articles[idx]) {
+          activeLinkIndex = idx;
+          fetch('/active_rss', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: articles[idx].link, title: articles[idx].title })
+          }).catch(()=>{});
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    fetchRSS();
+    animate();
+    setInterval(fetchRSS, 300000);
+  </script>
+</body>
+</html>`
+		_ = os.WriteFile(rssPath, []byte(rssHTML), 0o644)
+	}
 }
 
 func startLocalWidgetServer(dir string) string {

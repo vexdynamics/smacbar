@@ -184,14 +184,17 @@ Add your widget to `~/.config/smacbar/config.json`:
 
 The RSS Ticker widget (`rss_ticker.html`) fetches live news headlines and scrolls them seamlessly across your Touch Bar.
 
-To use your own RSS feed (e.g. Vex Dynamics, Hacker News, BBC, NYT), edit `~/.config/smacbar/widgets/rss_ticker.html` and update the RSS feed URL:
+To use your own RSS feed (e.g. Vex Dynamics, Hacker News, BBC, NYT), edit `~/.config/smacbar/widgets/rss_ticker.html` and update the feed URL in the `urls` array — the first entry is fetched directly, the rest are CORS-proxy fallbacks used if the direct fetch is blocked:
 
 ```javascript
 const urls = [
   "https://vexdynamics.com/rss.xml",
-  "https://corsproxy.io/?https://vexdynamics.com/rss.xml"
+  "https://corsproxy.io/?https://vexdynamics.com/rss.xml",
+  "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://vexdynamics.com/rss.xml")
 ];
 ```
+
+Also update the hardcoded offline fallback headlines further down in the same file (the `articles = [...]` list inside `fetchRSS()`) — they're shown if every feed URL above fails, and still reference Vex Dynamics by default.
 
 ---
 

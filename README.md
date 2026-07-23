@@ -63,14 +63,14 @@
       "id": "rss-ticker-widget",
       "type": "web_file",
       "path": "rss_ticker.html",
-      "width": 180
+      "width": 170
     },
     {
       "id": "animation-widget",
       "type": "web_file",
       "path": "animation.html",
       "open": "com.apple.ActivityMonitor",
-      "width": 130
+      "width": 170
     },
     {
       "id": "mattermost",
@@ -83,10 +83,35 @@
       "icon": "terminal",
       "label": "Warp",
       "bundle_id": "dev.warp.Warp-Stable"
+    },
+    {
+      "id": "chrome",
+      "icon": "globe",
+      "label": "Chrome",
+      "bundle_id": "com.google.Chrome"
     }
   ]
 }
 ```
+
+---
+
+## 📐 Touch Bar Width Limits & Sizing Guidelines
+
+When designing and building custom widgets, keep physical Touch Bar screen boundaries and native inter-item spacing in mind:
+
+1. **Max Screen Capacity**:
+   - Total usable Touch Bar modal screen width is approximately **600 – 610 points** (between the system Close box on the left and the Control Strip volume/brightness buttons on the right).
+
+2. **Native Item Spacing**:
+   - macOS automatically inserts **~18 points of native inter-item spacing** between every Touch Bar button item.
+   - For $N$ items, inter-item padding equals $(N - 1) \times 18\text{px}$.
+
+3. **Width Formula**:
+   $$\sum \text{Widget Content Widths} + (\text{Num Widgets} \times 18) \le \mathbf{510\text{px}}$$
+
+> [!IMPORTANT]
+> **Golden Sizing Rule**: Keep the sum of all widget `"width"` properties **$\le 430\text{px}$** (e.g. 170px RSS Ticker + 170px CyberPulse + three 30px App Badges = 430px content width). If the total combined width (content + inter-item spacing) exceeds **~510–540px**, macOS `NSTouchBar` will automatically hide or clip the rightmost widget items!
 
 ---
 

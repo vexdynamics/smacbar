@@ -1,16 +1,21 @@
 # SMacBar 🚀
 
-**SMacBar** is a lightweight, customizable macOS Touch Bar utility written in **Go & Objective-C (CGo)**. It presents a persistent, system-wide Touch Bar dashboard using macOS private APIs (`DFRFoundation`), featuring real-time app badge status indicators, high-performance 60 FPS Web Widgets (HTML/CSS/JS, Canvas, Animations, Videos, GIFs), and interactive tap actions.
+[![macOS](https://img.shields.io/badge/OS-macOS_10.14+-000000?style=for-the-badge&logo=apple&logoColor=white)](https://apple.com)
+[![Go Version](https://img.shields.io/badge/Go-1.20+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+**SMacBar** is a lightweight, high-performance Touch Bar utility for macOS written in **Go & Objective-C (CGo)**. It transforms your Touch Bar into a persistent, interactive system dashboard featuring **60 FPS Web Widgets** (HTML/CSS/JS, Canvas, Animations), a **Live RSS Scrolling News Ticker**, real-time **Dock Badge Counters**, and **Interactive Touch Actions**.
 
 ---
 
 ## ✨ Features
 
-- **Persistent Touch Bar Dashboard**: Integrates with the macOS Control Strip (`dev.smacbar.tray`) and presents a persistent system modal dashboard.
-- **Dock Badge Counters**: Real-time Dock badge count monitoring (`lsappinfo`) with custom badge overlays on SF Symbols icons.
-- **60 FPS Web Widgets**: Render custom HTML5, CSS animations, JavaScript, HTML Canvas, GIFs, and videos directly onto Touch Bar items.
-- **Interactive Click / Tap Actions**: Tap any widget on your Touch Bar to launch applications, open URLs, or execute custom shell scripts.
-- **Hot Configuration**: Easily customize widgets, layouts, and frame widths in `~/.config/smacbar/config.json`.
+- **Persistent Control Strip Tray Icon**: Integrates directly into the macOS Control Strip (`dev.smacbar.tray`). Tap the tray icon (🐼) to toggle your dashboard anytime.
+- **60 FPS WebWidgets Engine**: Render custom HTML5, CSS animations, JavaScript, Canvas motion graphics, and live widgets directly onto Touch Bar items at a smooth 60 FPS.
+- **Live RSS Scrolling News Ticker**: Smooth 60 FPS news marquee fetching live RSS feeds (such as [Vex Dynamics RSS](https://vexdynamics.com/rss.xml)).
+- **Interactive Tap Actions**: Tap any widget on your Touch Bar to launch applications, open URLs, focus open apps, or execute custom shell scripts. Tapping the RSS Ticker instantly opens the currently visible news article in your browser.
+- **Real-Time App Dock Badges**: Live Dock badge counter monitoring (`lsappinfo`) with custom badge overlays on SF Symbols icons.
+- **Multi-Workspace & Multi-Space Support**: Joins all macOS Spaces (`CanJoinAllSpaces`), maintaining 60 FPS performance across all Desktop Workspaces and Fullscreen applications.
 
 ---
 
@@ -26,12 +31,12 @@
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/smacbar.git
+   git clone https://github.com/vexdynamics/smacbar.git
    cd smacbar
    ```
 
-2. **Build and Sign the Application**:
-   Run the included build script to compile the Go binary, build `SMacBar.app`, and sign it:
+2. **Build & Sign SMacBar**:
+   Run the included build script to compile the Go binary, generate `Info.plist`, build `SMacBar.app`, and sign it:
    ```bash
    ./scripts/build.sh
    ```
@@ -40,13 +45,13 @@
    ```bash
    open build/SMacBar.app
    ```
-   You will see the **SMacBar icon** (🐼) appear in your Touch Bar Control Strip. Tap it to reveal your dashboard!
+   The **SMacBar tray icon** (🐼) will appear in your Touch Bar Control Strip. Tap it to expand your dashboard!
 
 ---
 
 ## ⚙️ Configuration (`~/.config/smacbar/config.json`)
 
-`SMacBar` loads configuration from `~/.config/smacbar/config.json`. If it doesn't exist, a default config is created automatically.
+`SMacBar` loads its configuration from `~/.config/smacbar/config.json`. If it doesn't exist, a default config is automatically generated.
 
 ### Example Configuration:
 
@@ -55,11 +60,17 @@
   "poll_interval_seconds": 5,
   "widgets": [
     {
+      "id": "rss-ticker-widget",
+      "type": "web_file",
+      "path": "rss_ticker.html",
+      "width": 180
+    },
+    {
       "id": "animation-widget",
       "type": "web_file",
       "path": "animation.html",
       "open": "com.apple.ActivityMonitor",
-      "width": 260
+      "width": 130
     },
     {
       "id": "mattermost",
@@ -79,50 +90,25 @@
 
 ---
 
-## 🖱️ Making Widgets Clickable / Interactive
+## 🖱️ Interactive Touch Actions
 
-Any widget (App Badge or Web Widget) can perform an action when tapped on the Touch Bar!
-
-### Tap Action Properties:
+Any widget (App Badge or WebWidget) can perform a tap action when touched on the Touch Bar:
 
 | Property | Example Value | Description |
 | :--- | :--- | :--- |
-| `"open"` | `"com.apple.ActivityMonitor"` or `"https://github.com"` | Opens an app by Bundle ID, a URL in browser, or a file path |
-| `"command"` | `"say 'Hello World'"` or `"open -a Terminal"` | Executes any arbitrary shell command on tap |
-| `"bundle_id"` | `"Mattermost.Desktop"` | Focuses / launches the app and displays its Dock badge counter |
+| `"open"` | `"com.apple.ActivityMonitor"` or `"https://vexdynamics.com"` | Focuses/opens an app by Bundle ID, opens a URL, or opens a file |
+| `"command"` | `"osascript -e 'set volume input volume 0'"` | Executes an arbitrary shell script on tap |
+| `"bundle_id"` | `"Mattermost.Desktop"` | Displays Dock unread badge count & launches app on tap |
 | `"url"` | `"https://news.ycombinator.com"` | Opens the web URL on tap |
-
-#### Examples:
-
-- **Launch Activity Monitor on tap**:
-  ```json
-  {
-    "id": "cyber-pulse",
-    "type": "web_file",
-    "path": "animation.html",
-    "open": "com.apple.ActivityMonitor",
-    "width": 260
-  }
-  ```
-
-- **Execute Shell Command on tap**:
-  ```json
-  {
-    "id": "mute-mic",
-    "type": "web_file",
-    "path": "mic.html",
-    "command": "osascript -e 'set volume input volume 0'",
-    "width": 120
-  }
-  ```
 
 ---
 
-## 🎨 Writing Custom Web Widgets
+## 🎨 How to Create & Add Custom HTML Web Widgets
 
 Place custom `.html`, `.js`, or `.css` files inside `~/.config/smacbar/widgets/`.
 
-### Animated Canvas & HTML5 Template:
+### 1. Create Your HTML Widget File:
+Create a file named `~/.config/smacbar/widgets/my_widget.html`:
 
 ```html
 <!DOCTYPE html>
@@ -131,38 +117,67 @@ Place custom `.html`, `.js`, or `.css` files inside `~/.config/smacbar/widgets/`
 <meta charset="utf-8">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #0d0e15; color: #fff;
+  html, body {
+    background: #0d0e15;
+    color: #00f0ff;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 30px; width: 260px; padding: 0 10px; overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30px;
+    width: 100%;
+    padding: 0 8px;
+    overflow: hidden;
   }
-  .badge { background: linear-gradient(135deg, #ff007f, #7928ca); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+  .title { font-size: 11px; font-weight: 700; }
+  .pulse { width: 10px; height: 10px; border-radius: 50%; background: #30d158; box-shadow: 0 0 8px #30d158; }
 </style>
 </head>
 <body>
-  <span class="badge">LIVE</span>
-  <span style="font-size:11px; font-weight:700;">MY CUSTOM WIDGET</span>
-  <script>
-    // Drive animations via setInterval for 60 FPS offscreen execution
-    setInterval(() => {
-      // Your update logic here
-    }, 25);
-  </script>
+  <span class="title">MY WIDGET</span>
+  <div class="pulse"></div>
 </body>
 </html>
+```
+
+### 2. Register It in `config.json`:
+Add your widget to `~/.config/smacbar/config.json`:
+
+```json
+{
+  "id": "my-custom-widget",
+  "type": "web_file",
+  "path": "my_widget.html",
+  "open": "https://vexdynamics.com",
+  "width": 140
+}
+```
+
+---
+
+## 📰 Customizing the RSS Ticker Widget
+
+The RSS Ticker widget (`rss_ticker.html`) fetches live news headlines and scrolls them seamlessly across your Touch Bar.
+
+To use your own RSS feed (e.g. Vex Dynamics, Hacker News, BBC, NYT), edit `~/.config/smacbar/widgets/rss_ticker.html` and update the RSS feed URL:
+
+```javascript
+const urls = [
+  "https://vexdynamics.com/rss.xml",
+  "https://corsproxy.io/?https://vexdynamics.com/rss.xml"
+];
 ```
 
 ---
 
 ## 🧠 Architecture Overview
 
-- **Go Main Runtime** (`cmd/smacbar`): Manages config loading, event loops, widget polling goroutines, and tap handlers.
-- **Objective-C Bridge** (`internal/touchbar`): Uses private frameworks (`DFRFoundation`) to manage Control Strip items (`dev.smacbar.tray`) and present system modal Touch Bars.
-- **Offscreen WebKit Renderer**: Hosts WebViews inside an unthrottled on-screen 1x1 transparent anchor window, capturing snapshots into native wide `NSButton` image views at 60 FPS.
+- **Go Core Engine** (`cmd/smacbar`): Configuration loader, widget polling, HTTP local widget server (`http://127.0.0.1:<port>`), and tap action dispatcher.
+- **Objective-C / CGo Bridge** (`internal/touchbar`): Interoperates with macOS private frameworks (`DFRFoundation`) to manage system Control Strip presence and present persistent system modal Touch Bars.
+- **Unthrottled WebKit Renderer**: Hosts WebViews inside a transparent 1x1 on-screen anchor window joining all macOS Spaces (`CanJoinAllSpaces`), capturing high-resolution snapshot images into native Touch Bar buttons at 60 FPS.
 
 ---
 
 ## 📄 License
 
-MIT License. Feel free to customize and extend!
+Distributed under the MIT License. Developed by **Vex Dynamics** ([vexdynamics.com](https://vexdynamics.com)).
